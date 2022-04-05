@@ -4,8 +4,15 @@
   "description": "Two-player wordle",
   "main": "index.js",
   "scripts": {
+    "build": "esbuild --bundle --minify biwordle.js --outfile=public/dist.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "macarc",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "dependencies": {
+    "esbuild": "^0.14.31",
+    "express": "^4.17.3",
+    "socket.io": "^4.4.1",
+    "socket.io-client": "^4.4.1"
+  }
 }

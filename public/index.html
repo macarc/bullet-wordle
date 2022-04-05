@@ -1,0 +1,34 @@
+<style>
+table {
+  font-size: 2rem;
+}
+td {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.2rem;
+  color: white;
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+td.correct {
+  background: green;
+}
+td.wrong-place {
+  background: orange;
+}
+td.wrong {
+  background: grey;
+}
+</style>
+<button id="new-game">New Game</button>
+<p id="loading" style="display: none">Pairing... please wait</p>
+
+<div id="game-board" style="display: none">
+  <table id="wordle-board"></table>
+
+  <input id="guess" readonly />
+  <button id="make-guess">Guess</button>
+  <p id="length-warning" style="display: none">Word must be 5 letters!</p>
+</div>
+<script src="dist.js"></script>
