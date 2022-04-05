@@ -39,11 +39,12 @@ function swapTurn(socket) {
   games[games[socket.id].otherPlayer.id].turn = games[socket.id].otherPlayer.id;
 }
 
-function winner(socket) {
-  socket.emit('winner', true);
-  games[socket.id].otherPlayer.emit('winner', false)
-  delete games[games[socket.id].otherPlayer.id];
-  delete games[socket.id];
+function winner(player) {
+  const word = games[player.id].word;
+  player.emit('winner', { you: true, word });
+  games[player.id].otherPlayer.emit('winner', { you: false, word })
+  delete games[games[player.id].otherPlayer.id];
+  delete games[player.id];
 }
 
 io.on('connection', async (socket) => {
@@ -97,6 +98,9 @@ io.on('connection', async (socket) => {
   });
 
   socket.conn.on('close', () => {
+    if (games[socket.id]) {
+      winner(games[socket.id].otherPlayer);
+    }
     if (waitingPlayers.includes(socket)) {
       waitingPlayers.splice(waitingPlayers.indexOf(socket), 1);
     }

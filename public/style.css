@@ -1,0 +1,108 @@
+html {
+  width: 100vw;
+  height: 100vh;
+  background: #222;
+}
+html * {
+  color: white;
+}
+#wordle-board {
+  margin: auto;
+}
+#wordle-board td {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.2rem;
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
+}
+td.correct, #keyboard button.correct {
+  background: green;
+}
+td.wrong-place, #keyboard button.wrong-place {
+  background: orange;
+}
+td.wrong, #keyboard button.wrong {
+  background: #333;
+}
+
+#keyboard {
+  position: fixed;
+  bottom: 1rem;
+  left: 0;
+  width: 100vw;
+}
+
+#keyboard button {
+  font-size: 3vw;
+  padding: 0.5rem;
+  width: 9vw;
+  background: darkgrey;
+  border: none;
+  margin: 0.05rem;
+  border-radius: 0.5rem;
+}
+
+#keyboard button:active {
+  background: #333;
+}
+
+.double {
+  width: 15vw !important;
+}
+
+.keyboard-row {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+main {
+  display: block;
+  width: 80vw;
+  border-radius: 1rem;
+  position: fixed;
+  top: 2rem;
+  left: 10vw;
+  height: calc(100vh - 4rem);
+}
+
+#new-game {
+  font-size: 2rem;
+  padding: 1rem;
+  background: forestgreen;
+  border-radius: 0.5rem;
+  border: none;
+  display: block;
+  margin: 4rem auto;
+  cursor: pointer;
+}
+#new-game:active {
+  background: green;
+}
+
+#loading {
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+#loading-gif {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 1rem;
+  position: relative;
+  top: 0.5rem;
+}
+
+input {
+  background: #333;
+}
+
+@media only screen and (max-width: 1000px) {
+  .keyboard-row {
+    height: 8vh;
+  }
+
+}
