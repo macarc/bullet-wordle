@@ -9,58 +9,60 @@
   </head>
   <body>
     <main>
-      <button id="new-game">New Game</button>
-      <p id="loading" style="display: none"><img id="loading-gif" src="loading.gif" alt="Loading image" />Pairing... please wait</p>
-
       <div id="game-board" style="display: none">
         <table id="wordle-board"></table>
 
         <p id="your-turn">Your turn - guess a word.</p>
         <p id="other-turn">Wait for the other person to make a guess.</p>
 
-        <div id="your-time"></div>
-        <div id="other-time"></div>
+        <div id="time-holder">
+          <div id="other-time"></div>
+          <div id="your-time"></div>
+        </div>
 
         <p id="length-warning" style="display: none">Your guess must be a valid English 5 letter word!</p>
+        <p id="game-finish" style="display: none"></p>
+      </div>
+
+      <button id="new-game">New Game</button>
+      <p id="loading" style="display: none"><img id="loading-gif" src="loading.gif" alt="Loading image" />Pairing... please wait</p>
     </main>
 
-
+    <section id="keyboard">
+      <div class="keyboard-row">
+        <button id="q">Q</button>
+        <button id="w">W</button>
+        <button id="e">E</button>
+        <button id="r">R</button>
+        <button id="t">T</button>
+        <button id="y">Y</button>
+        <button id="u">U</button>
+        <button id="i">I</button>
+        <button id="o">O</button>
+        <button id="p">P</button>
       </div>
-      <section id="keyboard">
-        <div class="keyboard-row">
-          <button id="q">Q</button>
-          <button id="w">W</button>
-          <button id="e">E</button>
-          <button id="r">R</button>
-          <button id="t">T</button>
-          <button id="y">Y</button>
-          <button id="u">U</button>
-          <button id="i">I</button>
-          <button id="o">O</button>
-          <button id="p">P</button>
-        </div>
-        <div class="keyboard-row">
-          <button id="a">A</button>
-          <button id="s">S</button>
-          <button id="d">D</button>
-          <button id="f">F</button>
-          <button id="g">G</button>
-          <button id="h">H</button>
-          <button id="j">J</button>
-          <button id="k">K</button>
-          <button id="l">L</button>
-        </div>
-        <div class="keyboard-row">
-          <button class="double">Delete</button>
-          <button id="z">Z</button>
-          <button id="x">X</button>
-          <button id="c">C</button>
-          <button id="v">V</button>
-          <button id="b">B</button>
-          <button id="n">N</button>
-          <button id="m">M</button>
-          <button class="double">Go</button>
-        </div>
-      </section>
+      <div class="keyboard-row">
+        <button id="a">A</button>
+        <button id="s">S</button>
+        <button id="d">D</button>
+        <button id="f">F</button>
+        <button id="g">G</button>
+        <button id="h">H</button>
+        <button id="j">J</button>
+        <button id="k">K</button>
+        <button id="l">L</button>
+      </div>
+      <div class="keyboard-row">
+        <button class="double">Delete</button>
+        <button id="z">Z</button>
+        <button id="x">X</button>
+        <button id="c">C</button>
+        <button id="v">V</button>
+        <button id="b">B</button>
+        <button id="n">N</button>
+        <button id="m">M</button>
+        <button class="double">Go</button>
+      </div>
+    </section>
   </body>
 </html>

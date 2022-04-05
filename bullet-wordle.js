@@ -11,6 +11,8 @@ function roundToOneDecimalPlace(number) {
   return Math.max(Math.round(number * 10) / 10, 0);
 }
 
+const maxTime = 60;
+
 const socket = io();
 
 socket.on('connect', () => {
@@ -26,16 +28,16 @@ let playingGame = false;
 let keyboardGuesses = {};
 
 let times = {
-  thisPlayer: 60,
-  otherPlayer: 60,
+  thisPlayer: maxTime,
+  otherPlayer: maxTime,
 };
 
 socket.on('game-start', (meFirst) => {
   myTurn = meFirst;
   console.log('Game start!')
   times = {
-    thisPlayer: 60,
-    otherPlayer: 60
+    thisPlayer: maxTime,
+    otherPlayer: maxTime
   }
   playingGame = true;
   guesses = [];
@@ -62,12 +64,14 @@ socket.on('reject-word', () => {
   show('length-warning');
 });
 
-socket.on('winner', ({ youWon, word }) => {
-  if (youWon) alert(`You won! The word was ${word}.`)
-  else alert(`You lost. The word was ${word}.`)
+socket.on('winner', ({ youWon, word, reason }) => {
+  renderGameTerminationText(youWon, reason, word);
   playingGame = false;
+  myTurn = false;
   hide('your-turn');
   hide('other-turn');
+  show('new-game');
+  show('game-finish')
 })
 
 function precedence(guessMark) {
@@ -88,10 +92,35 @@ function updateKeyboardGuesses(guess) {
 function gameView() {
   hide('new-game');
   hide('loading');
+  hide('game-finish');
+  hide('your-turn');
+  hide('other-turn');
   show('game-board');
   document.querySelector('#new-game').style.display = 'none';
   document.querySelector('#loading').style.display = 'none';
   document.querySelector('#game-board').style.display = 'block';
+}
+
+function renderGameTerminationText(thisPlayerWon, reason, word) {
+  const p = document.getElementById('game-finish');
+  p.innerText = thisPlayerWon ? 'You won! ' : 'You lost. ';
+  switch (reason) {
+    case 'won':
+      p.innerText += thisPlayerWon
+        ? 'You guessed the word correctly.'
+        : 'The other player guessed the word first.';
+      break;
+    case 'time':
+      p.innerText += thisPlayerWon
+        ? 'The other player ran out of time. The word was \'' + word + '\'.'
+        : 'You ran out of time. The word was \'' + word + '\'.';
+      break;
+    case 'left':
+      p.innerText += thisPlayerWon
+        ? 'The other player left the game. The word was \'' + word + '\'.'
+        : 'You left the game. The word was \'' + word + '\'.';
+      break;
+  }
 }
 
 function render() {
@@ -181,15 +210,19 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   })
   window.setInterval(() => {
-    if (!playingGame) return;
+    if (playingGame) {
+      if (myTurn) {
+        times.thisPlayer = roundToOneDecimalPlace(times.thisPlayer - 0.1);
+        if (times.thisPlayer <= 0) socket.emit('game-timeout')
+      } else {
+        times.otherPlayer = roundToOneDecimalPlace(times.otherPlayer - 0.1);
+      }
+      document.querySelector('#your-time').innerHTML = times.thisPlayer % 1 === 0 ? times.thisPlayer + '.0s' : times.thisPlayer + 's';
+      document.querySelector('#other-time').innerHTML = times.otherPlayer % 1 === 0 ? times.otherPlayer + '.0s' : times.otherPlayer + 's';
 
-    if (myTurn) {
-      times.thisPlayer = roundToOneDecimalPlace(times.thisPlayer - 0.1);
-      if (times.thisPlayer <= 0) socket.emit('game-timeout')
-    } else {
-      times.otherPlayer = roundToOneDecimalPlace(times.otherPlayer - 0.1);
+      // - 0.4rem is to account for padding...sigh
+      document.querySelector('#your-time').style.width = 'calc(' + times.thisPlayer / maxTime * 100 + '% - 0.4rem)';
+      document.querySelector('#other-time').style.width = 'calc(' + times.otherPlayer / maxTime * 100 + '% - 0.4rem)';
     }
-    document.querySelector('#your-time').innerHTML = times.thisPlayer % 1 === 0 ? times.thisPlayer + '.0' : times.thisPlayer;
-    document.querySelector('#other-time').innerHTML = times.otherPlayer % 1 === 0 ? times.otherPlayer + '.0' : times.otherPlayer;
   }, 100)
 });

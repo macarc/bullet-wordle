@@ -39,10 +39,10 @@ function swapTurn(socket) {
   games[games[socket.id].otherPlayer.id].turn = games[socket.id].otherPlayer.id;
 }
 
-function winner(player) {
+function winner(player, reason) {
   const word = games[player.id].word;
-  player.emit('winner', { you: true, word });
-  games[player.id].otherPlayer.emit('winner', { you: false, word })
+  player.emit('winner', { youWon: true, word, reason });
+  games[player.id].otherPlayer.emit('winner', { youWon: false, word, reason })
   delete games[games[player.id].otherPlayer.id];
   delete games[player.id];
 }
@@ -68,7 +68,7 @@ io.on('connection', async (socket) => {
       games[socket.id].time -= (new Date() - games[socket.id].lastMove) / 1000;
       if (games[socket.id].time <= 0) {
         games[socket.id].time = 0;
-        winner(socket);
+        winner(socket, 'time');
       }
       games[socket.id].lastMove = null;
       games[games[socket.id].otherPlayer.id].lastMove = new Date();
@@ -88,18 +88,20 @@ io.on('connection', async (socket) => {
       });
 
       if (guess === games[socket.id].word) {
-        winner(socket);
+        winner(socket, 'won');
       }
     }
   });
 
   socket.on('game-timeout', () => {
-    if (games[socket.id]) winner(games[socket.id].otherPlayer);
+    if (games[socket.id]) winner(games[socket.id].otherPlayer, 'time');
   });
 
   socket.conn.on('close', () => {
     if (games[socket.id]) {
-      winner(games[socket.id].otherPlayer);
+      console.log('socket', socket.id, 'closed');
+      console.log('socket', games[socket.id].otherPlayer.id, 'wins');
+      winner(games[socket.id].otherPlayer, 'left');
     }
     if (waitingPlayers.includes(socket)) {
       waitingPlayers.splice(waitingPlayers.indexOf(socket), 1);
