@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   margin: 0 auto;
   padding: 0;
   width: 99vw;
@@ -21,13 +22,16 @@ html * {
   font-family: sans-serif;
   font-weight: bold;
 }
-td.correct, #keyboard button.correct {
+td.correct,
+#keyboard button.correct {
   background: green;
 }
-td.wrong-place, #keyboard button.wrong-place {
+td.wrong-place,
+#keyboard button.wrong-place {
   background: orange;
 }
-td.wrong, #keyboard button.wrong {
+td.wrong,
+#keyboard button.wrong {
   background: #333;
 }
 
@@ -118,7 +122,8 @@ input {
   margin: 0 auto;
 }
 
-#your-time, #other-time {
+#your-time,
+#other-time {
   width: calc(100% - 0.4rem);
   margin-left: auto;
   margin-right: 0;

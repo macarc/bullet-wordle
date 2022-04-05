@@ -1,3 +1,3 @@
-const { test } = require('./wordle');
+const { test } = require("./wordle");
 
 test();
