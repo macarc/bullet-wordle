@@ -3,57 +3,12 @@ const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io')
 const { pickableWords, validWords } = require('./words');
+const { checkGuess } = require('./wordle');
 
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {});
 
-const wordLength = 5;
-
-function countsOf(word) {
-  const counts = {};
-  for (const letter of word) {
-    if (counts[letter]) {
-      counts[letter] += 1;
-    } else {
-      counts[letter] = 1;
-    }
-  }
-  return counts;
-}
-
-function indexesOf(word, letter) {
-  const result = [];
-  for (let i = 0; i < word.length; i++) {
-    if (word[i] == letter) result.push(i);
-  }
-  return result;
-}
-
-function isntInCorrectSpot(guess, word, letter) {
-  for (const i of indexesOf(word, letter)) {
-    if (guess[i] !== letter) return true;
-  }
-  return false;
-}
-
-function checkGuess(guess, actualWord) {
-  // This isn't correct yet, but good enough
-  const result = [];
-  const counts = countsOf(actualWord);
-  for (let i = 0; i < wordLength; i++) {
-    const letter = guess[i];
-    if (letter === actualWord[i]) {
-      result.push({ letter, mark: 'correct' });
-    } else if (counts[letter] && isntInCorrectSpot(guess, actualWord, letter)) {
-      result.push({ letter, mark: 'wrong-place' })
-      counts[letter] -= 1;
-    } else {
-      result.push({ letter, mark: 'wrong' })
-    }
-  }
-  return result;
-}
 
 const games = {};
 
@@ -105,13 +60,12 @@ io.on('connection', async (socket) => {
       swapTurn(socket);
       const checked = checkGuess(guess, games[socket.id].word);
       socket.emit('made-guess', checked);
+      games[socket.id].otherPlayer.emit('made-guess', checked);
       if (guess === games[socket.id].word) {
         socket.emit('winner', true);
         games[socket.id].otherPlayer.emit('winner', false)
         delete games[games[socket.id].otherPlayer.id];
         delete games[socket.id];
-      } else {
-        games[socket.id].otherPlayer.emit('made-guess', checked);
       }
     }
   });
@@ -126,3 +80,4 @@ io.on('connection', async (socket) => {
 app.use(express.static(path.join(__dirname, 'public')));
 
 httpServer.listen(3000);
+
