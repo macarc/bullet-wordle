@@ -1,10 +1,10 @@
 {
-  "name": "biwordle",
+  "name": "bullet-wordle",
   "version": "0.0.1",
   "description": "Two-player wordle",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild --bundle --minify biwordle.js --outfile=public/dist.js",
+    "build": "esbuild --bundle --minify bullet-wordle.js --outfile=public/dist.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "macarc",
