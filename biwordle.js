@@ -7,6 +7,10 @@ function hide(id) {
   document.getElementById(id).style.display = 'none';
 }
 
+function roundToOneDecimalPlace(number) {
+  return Math.max(Math.round(number * 10) / 10, 0);
+}
+
 const socket = io();
 
 socket.on('connect', () => {
@@ -17,18 +21,29 @@ let guesses = [];
 
 let myTurn = false;
 
+let times = {
+  thisPlayer: 60,
+  otherPlayer: 60,
+}
+
 socket.on('game-start', (meFirst) => {
   myTurn = meFirst;
   console.log('Game start!')
+  times = {
+    thisPlayer: 60,
+    otherPlayer: 60
+  }
   guesses = [];
   document.querySelector('#guess').removeAttribute('readonly');
   gameView();
   render();
 });
 
-socket.on('made-guess', (guess) => {
+socket.on('made-guess', ({ guess, yourTime, otherTime }) => {
   if (myTurn) document.querySelector('#guess').value = '';
   myTurn = !myTurn;
+  times.thisPlayer = roundToOneDecimalPlace(yourTime);
+  times.otherPlayer = roundToOneDecimalPlace(otherTime);
   guesses.push(guess);
   console.log('guess -> ', guess);
   render();
@@ -95,4 +110,14 @@ document.addEventListener('DOMContentLoaded', () => {
       socket.emit('guess', document.querySelector('#guess').value);
     }
   })
-})
+  window.setInterval(() => {
+    if (myTurn) {
+      times.thisPlayer = roundToOneDecimalPlace(times.thisPlayer - 0.1);
+      if (times.thisPlayer <= 0) socket.emit('game-timeout')
+    } else {
+      times.otherPlayer = roundToOneDecimalPlace(times.otherPlayer - 0.1);
+    }
+    document.querySelector('#your-time').innerHTML = times.thisPlayer % 1 === 0 ? times.thisPlayer + '.0' : times.thisPlayer;
+    document.querySelector('#other-time').innerHTML = times.otherPlayer % 1 === 0 ? times.otherPlayer + '.0' : times.otherPlayer;
+  }, 100)
+});

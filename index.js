@@ -18,8 +18,8 @@ async function makePairing(socket) {
   if (waitingPlayers.length > 0) {
     const otherPlayer = waitingPlayers.shift();
     const word = chooseWord();
-    games[socket.id] = { otherPlayer, word, turn: socket.id };
-    games[otherPlayer.id] = { otherPlayer: socket, word, turn: socket.id };
+    games[socket.id] = { otherPlayer, word, turn: socket.id, time: 60, lastMove: new Date() };
+    games[otherPlayer.id] = { otherPlayer: socket, word, turn: socket.id, time: 60, lastMove: null };
     socket.emit('game-start', true);
     otherPlayer.emit('game-start', false);
   } else {
@@ -37,6 +37,13 @@ function isValidWord(word) {
 function swapTurn(socket) {
   games[socket.id].turn = games[socket.id].otherPlayer.id;
   games[games[socket.id].otherPlayer.id].turn = games[socket.id].otherPlayer.id;
+}
+
+function winner(socket) {
+  socket.emit('winner', true);
+  games[socket.id].otherPlayer.emit('winner', false)
+  delete games[games[socket.id].otherPlayer.id];
+  delete games[socket.id];
 }
 
 io.on('connection', async (socket) => {
@@ -57,17 +64,36 @@ io.on('connection', async (socket) => {
         return;
       }
 
+      games[socket.id].time -= (new Date() - games[socket.id].lastMove) / 1000;
+      if (games[socket.id].time <= 0) {
+        games[socket.id].time = 0;
+        winner(socket);
+      }
+      games[socket.id].lastMove = null;
+      games[games[socket.id].otherPlayer.id].lastMove = new Date();
+
       swapTurn(socket);
+
       const checked = checkGuess(guess, games[socket.id].word);
-      socket.emit('made-guess', checked);
-      games[socket.id].otherPlayer.emit('made-guess', checked);
+      socket.emit('made-guess', {
+        guess: checked,
+        yourTime: games[socket.id].time,
+        otherTime: games[games[socket.id].otherPlayer.id].time
+      });
+      games[socket.id].otherPlayer.emit('made-guess', {
+        guess: checked,
+        yourTime: games[games[socket.id].otherPlayer.id].time,
+        otherTime: games[socket.id].time
+      });
+
       if (guess === games[socket.id].word) {
-        socket.emit('winner', true);
-        games[socket.id].otherPlayer.emit('winner', false)
-        delete games[games[socket.id].otherPlayer.id];
-        delete games[socket.id];
+        winner(socket);
       }
     }
+  });
+
+  socket.on('game-timeout', () => {
+    winner(games[socket.id].otherPlayer);
   });
 
   socket.conn.on('close', () => {
