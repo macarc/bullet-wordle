@@ -2,9 +2,10 @@
   "name": "bullet-wordle",
   "version": "0.0.1",
   "description": "Two-player wordle",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "build": "esbuild --bundle --minify bullet-wordle.js --outfile=public/dist.js",
+    "dev": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "macarc",
