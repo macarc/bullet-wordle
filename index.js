@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io')
-const port = 3000;
+const { validWords } = require('./words');
 
 const app = express();
 const httpServer = createServer(app);
@@ -63,10 +63,10 @@ async function makePairing(socket) {
   if (waitingPlayers.length > 0) {
     const otherPlayer = waitingPlayers.shift();
     const word = chooseWord();
-    games[socket.id] = { player: otherPlayer, word };
-    games[otherPlayer.id] = { player: socket, word };
-    socket.emit('game-start');
-    otherPlayer.emit('game-start');
+    games[socket.id] = { otherPlayer, word, turn: socket.id };
+    games[otherPlayer.id] = { otherPlayer: socket, word, turn: socket.id };
+    socket.emit('game-start', true);
+    otherPlayer.emit('game-start', false);
   } else {
     waitingPlayers.push(socket);
   }
@@ -74,6 +74,14 @@ async function makePairing(socket) {
 
 function chooseWord() {
   return 'guess'
+}
+function isValidWord(word) {
+  return validWords.includes(word);
+}
+
+function swapTurn(socket) {
+  games[socket.id].turn = games[socket.id].otherPlayer.id;
+  games[games[socket.id].otherPlayer.id].turn = games[socket.id].otherPlayer.id;
 }
 
 io.on('connection', async (socket) => {
@@ -87,20 +95,26 @@ io.on('connection', async (socket) => {
   })
 
   socket.on('guess', (guess) => {
-    if (games[socket.id]) {
+    if (games[socket.id] && games[socket.id].turn === socket.id) {
+      if (guess.length !== 5 || !isValidWord(guess)) {
+        socket.emit('reject-word');
+        return;
+      }
+
+      swapTurn(socket);
       const checked = checkGuess(guess, games[socket.id].word);
-      console.log(`check guess ${guess}:`, checked);
       socket.emit('made-guess', checked);
       if (guess === games[socket.id].word) {
         socket.emit('winner', true);
-        games[socket.id].player.emit('winner', false)
-        delete games[games[socket.id].player.id];
+        games[socket.id].otherPlayer.emit('winner', false)
+        delete games[games[socket.id].otherPlayer.id];
         delete games[socket.id];
       } else {
-        games[socket.id].player.emit('made-guess', checked);
+        games[socket.id].otherPlayer.emit('made-guess', checked);
       }
     }
-  })
+  });
+
   socket.conn.on('close', () => {
     if (waitingPlayers.includes(socket)) {
       waitingPlayers.splice(waitingPlayers.indexOf(socket), 1);

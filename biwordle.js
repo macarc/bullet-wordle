@@ -15,14 +15,20 @@ socket.on('connect', () => {
 
 let guesses = [];
 
-socket.on('game-start', () => {
+let myTurn = false;
+
+socket.on('game-start', (meFirst) => {
+  myTurn = meFirst;
   console.log('Game start!')
   guesses = [];
-  gameView();
   document.querySelector('#guess').removeAttribute('readonly');
+  gameView();
+  render();
 });
 
 socket.on('made-guess', (guess) => {
+  if (myTurn) document.querySelector('#guess').value = '';
+  myTurn = !myTurn;
   guesses.push(guess);
   console.log('guess -> ', guess);
   render();
@@ -31,6 +37,10 @@ socket.on('made-guess', (guess) => {
 socket.on('making-pairing', () => {
   show('loading');
 })
+
+socket.on('reject-word', () => {
+  show('length-warning');
+});
 
 socket.on('winner', (iWon) => {
   if (iWon) alert('You won!')
@@ -47,6 +57,13 @@ function gameView() {
 }
 
 function render() {
+  if (myTurn) {
+    show('your-turn');
+    hide('other-turn');
+  } else {
+    hide('your-turn');
+    show('other-turn');
+  }
   const table = document.querySelector('table');
   table.innerHTML = '';
   guesses.forEach(guess => renderGuess(guess, table));
@@ -73,10 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const guess = document.querySelector('#guess').value;
     if (guess.length != 5) {
       show('length-warning');
-    } else {
+    } else if (myTurn) {
       hide('length-warning');
       socket.emit('guess', document.querySelector('#guess').value);
-      document.querySelector('#guess').value = '';
     }
   })
 })
