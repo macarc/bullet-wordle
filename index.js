@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const { createServer } = require('http');
 const { Server } = require('socket.io')
-const { validWords } = require('./words');
+const { pickableWords, validWords } = require('./words');
 
 const app = express();
 const httpServer = createServer(app);
@@ -73,10 +73,10 @@ async function makePairing(socket) {
 }
 
 function chooseWord() {
-  return 'guess'
+  return pickableWords[Math.floor(Math.random() * pickableWords.length)];
 }
 function isValidWord(word) {
-  return validWords.includes(word);
+  return validWords.has(word);
 }
 
 function swapTurn(socket) {
@@ -95,6 +95,7 @@ io.on('connection', async (socket) => {
   })
 
   socket.on('guess', (guess) => {
+    guess = guess.toLowerCase();
     if (games[socket.id] && games[socket.id].turn === socket.id) {
       if (guess.length !== 5 || !isValidWord(guess)) {
         socket.emit('reject-word');
