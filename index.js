@@ -93,7 +93,7 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('game-timeout', () => {
-    winner(games[socket.id].otherPlayer);
+    if (games[socket.id]) winner(games[socket.id].otherPlayer);
   });
 
   socket.conn.on('close', () => {

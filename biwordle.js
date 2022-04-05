@@ -20,6 +20,7 @@ socket.on('connect', () => {
 let guesses = [];
 
 let myTurn = false;
+let playingGame = false;
 
 let times = {
   thisPlayer: 60,
@@ -33,6 +34,7 @@ socket.on('game-start', (meFirst) => {
     thisPlayer: 60,
     otherPlayer: 60
   }
+  playingGame = true;
   guesses = [];
   document.querySelector('#guess').removeAttribute('readonly');
   gameView();
@@ -60,6 +62,7 @@ socket.on('reject-word', () => {
 socket.on('winner', (iWon) => {
   if (iWon) alert('You won!')
   else alert('You lost.')
+  playingGame = false;
 })
 
 function gameView() {
@@ -111,6 +114,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   })
   window.setInterval(() => {
+    if (!playingGame) return;
+
     if (myTurn) {
       times.thisPlayer = roundToOneDecimalPlace(times.thisPlayer - 0.1);
       if (times.thisPlayer <= 0) socket.emit('game-timeout')
