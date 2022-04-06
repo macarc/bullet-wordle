@@ -33,8 +33,11 @@ let times = {
 };
 
 socket.on("game-start", (meFirst) => {
-  myTurn = meFirst;
   console.log("Game start!");
+  myTurn = meFirst;
+  keyboardGuesses = {};
+  clearKeyboard();
+  currentGuess = '';
   times = {
     thisPlayer: maxTime,
     otherPlayer: maxTime,
@@ -85,6 +88,12 @@ function precedence(guessMark) {
     default:
       return 0;
   }
+}
+
+function clearKeyboard() {
+  [...document.querySelectorAll('.keyboard-row button')].forEach(button => {
+    if (button.getAttribute('class') !== 'double') button.removeAttribute('class')
+  });
 }
 
 function updateKeyboardGuesses(guess) {
