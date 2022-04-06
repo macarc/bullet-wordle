@@ -122,4 +122,4 @@ io.on("connection", async (socket) => {
 
 app.use(express.static(path.join(__dirname, "public")));
 
-httpServer.listen(3000);
+httpServer.listen(process.env.PORT || 3000);
