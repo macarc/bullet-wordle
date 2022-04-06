@@ -61,6 +61,7 @@ socket.on("made-guess", ({ guess, yourTime, otherTime }) => {
 
 socket.on("making-pairing", () => {
   show("loading");
+  hide('new-game')
 });
 
 socket.on("reject-word", () => {

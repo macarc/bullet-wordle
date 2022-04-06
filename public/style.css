@@ -4,11 +4,17 @@ body {
   padding: 0;
   width: 99vw;
   height: 100vh;
+  height: -webkit-fill-available;
   background: #222;
   overflow: auto;
 }
 html * {
   color: white;
+}
+body {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
 }
 #wordle-board {
   margin: 1rem auto;
@@ -33,6 +39,12 @@ td.wrong-place,
 td.wrong,
 #keyboard button.wrong {
   background: #333;
+}
+
+#keyboard {
+  width: 60vw;
+  background: #222;
+  margin-bottom: 1rem;
 }
 
 #keyboard button {
@@ -62,10 +74,10 @@ td.wrong,
 
 main {
   display: block;
-  position: relative;
+  flex: 1;
+  overflow: scroll;
   width: 80vw;
   border-radius: 1rem;
-  margin: 4rem auto 2rem;
 }
 
 #new-game {
@@ -99,14 +111,6 @@ input {
   background: #333;
 }
 
-#keyboard {
-  position: fixed;
-  bottom: 1rem;
-  left: 20vw;
-  width: 60vw;
-  background: #222;
-}
-
 #your-time {
   border-radius: 0 0 0.5rem 0.5rem;
   background: #555;
@@ -137,7 +141,6 @@ p {
 
 @media only screen and (max-width: 1000px) {
   #keyboard {
-    left: 0;
     width: 100vw;
   }
   #keyboard button {
