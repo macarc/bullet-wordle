@@ -75,9 +75,15 @@ td.wrong,
 main {
   display: block;
   flex: 1;
-  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
   width: 80vw;
   border-radius: 1rem;
+}
+main::-webkit-scrollbar {
+  display: none;
 }
 
 #new-game {
