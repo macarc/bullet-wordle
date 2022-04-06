@@ -12,30 +12,18 @@ function countsOf(word) {
   return counts;
 }
 
-function indexesOf(word, letter) {
-  const result = [];
-  for (let i = 0; i < word.length; i++) {
-    if (word[i] == letter) result.push(i);
-  }
-  return result;
-}
-
-function isntInCorrectSpot(guess, word, letter) {
-  for (const i of indexesOf(word, letter)) {
-    if (guess[i] !== letter) return true;
-  }
-  return false;
-}
-
 module.exports.checkGuess = function (guess, actualWord) {
-  // This isn't correct yet, but good enough
   const result = [];
   const counts = countsOf(actualWord);
+
+  for (let i = 0; i < wordLength; i++) {
+    if (actualWord[i] === guess[i]) counts[actualWord[i]] -= 1;
+  }
   for (let i = 0; i < wordLength; i++) {
     const letter = guess[i];
     if (letter === actualWord[i]) {
       result.push({ letter, mark: "correct" });
-    } else if (counts[letter] && isntInCorrectSpot(guess, actualWord, letter)) {
+    } else if (counts[letter]) {
       result.push({ letter, mark: "wrong-place" });
       counts[letter] -= 1;
     } else {
@@ -63,4 +51,5 @@ module.exports.test = function () {
   test("aabbc", "abcba", ".??.?");
   test("abbbb", "abbab", "...!.");
   test("llaea", "blbbl", "!.!!?");
+  test("bbbxx", "axxax", "!?!!.");
 };
